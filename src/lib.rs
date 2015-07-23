@@ -6,18 +6,18 @@ use std::ffi::CString;
 use std::ptr;
 use poet_sys::*;
 
-extern fn apply_cpu_config_wrapper(states: *mut c_void,
-                                   num_states: c_uint,
-                                   id: c_uint,
-                                   last_id: c_uint) {
+pub extern fn apply_cpu_config_wrapper(states: *mut c_void,
+                                       num_states: c_uint,
+                                       id: c_uint,
+                                       last_id: c_uint) {
     unsafe {
         apply_cpu_config(states, num_states, id, last_id)
     }
 }
 
-extern fn get_current_cpu_state_wrapper(states: *const c_void,
-                                        num_states: c_uint,
-                                        curr_state_id: *mut c_uint) -> c_int {
+pub extern fn get_current_cpu_state_wrapper(states: *const c_void,
+                                            num_states: c_uint,
+                                            curr_state_id: *mut c_uint) -> c_int {
     unsafe {
         get_current_cpu_state(states, num_states, curr_state_id)
     }
@@ -46,21 +46,18 @@ pub fn poet_get_control_states(filename: Option<&CString>) -> Result<Vec<poet_co
         None => ptr::null(),
     };
     let mut states: *mut poet_control_state_t = ptr::null_mut::<poet_control_state_t>();
+    let mut nstates: u32 = 0;
+    if unsafe { get_control_states(name_ptr, &mut states, &mut nstates) } != 0 {
+        return Err("Failed to load control states");
+    }
+    let mut ret: Vec<poet_control_state_t> = Vec::with_capacity(nstates as usize);
+    // copy so we can free C-allocated memory
     unsafe {
-        let mut nstates: u32 = 0;
-        let res = get_control_states(name_ptr,
-                                     &mut states,
-                                     &mut nstates);
-        if res != 0 {
-            return Err("Failed to load control states");
-        }
-        // clone so we can free C-allocated memory (so user doesn't have to)
-        let mut ret = Vec::with_capacity(nstates as usize);
         ret.set_len(nstates as usize);
         ptr::copy_nonoverlapping(states, ret.as_mut_ptr(), nstates as usize);
         libc::free(states as *mut c_void);
-        Ok(ret)
     }
+    Ok(ret)
 }
 
 /// Attempt to load cpu states from a file.
@@ -70,21 +67,18 @@ pub fn poet_get_cpu_states(filename: Option<&CString>) -> Result<Vec<poet_cpu_st
         None => ptr::null(),
     };
     let mut states: *mut poet_cpu_state_t = ptr::null_mut::<poet_cpu_state_t>();
+    let mut nstates: u32 = 0;
+    if unsafe { get_cpu_states(name_ptr, &mut states, &mut nstates) } != 0 {
+        return Err("Failed to load cpu states");
+    }
+    // copy so we can free C-allocated memory
+    let mut ret: Vec<poet_cpu_state_t> = Vec::with_capacity(nstates as usize);
     unsafe {
-        let mut nstates: u32 = 0;
-        let res = get_cpu_states(name_ptr,
-                                 &mut states,
-                                 &mut nstates);
-        if res != 0 {
-            return Err("Failed to load cpu states");
-        }
-        // clone so we can free C-allocated memory (so user doesn't have to)
-        let mut ret = Vec::with_capacity(nstates as usize);
         ret.set_len(nstates as usize);
         ptr::copy_nonoverlapping(states, ret.as_mut_ptr(), nstates as usize);
         libc::free(states as *mut c_void);
-        Ok(ret)
     }
+    Ok(ret)
 }
 
 /// The `POET` struct wraps an underyling C struct.
