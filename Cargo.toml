@@ -1,0 +1,16 @@
+[package]
+name = "poet"
+version = "0.1.0"
+authors = ["Connor Imes <connor.k.imes@gmail.com>"]
+description = "Rust wrappers for poet"
+license = "MIT"
+homepage = "https://github.com/connorimes/poet-rust"
+repository = "https://github.com/connorimes/poet-rust"
+keywords = ["poet", "performance", "optimal", "energy", "toolkit", "feedback", "control"]
+
+[dependencies]
+libc = "0.1"
+
+[dependencies.poet-sys]
+#git = "https://github.com/connorimes/poet-sys.git"
+path = "/local/poet-sys"
