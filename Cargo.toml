@@ -12,5 +12,4 @@ keywords = ["poet", "performance", "optimal", "energy", "toolkit", "feedback", "
 libc = "0.1"
 
 [dependencies.poet-sys]
-#git = "https://github.com/connorimes/poet-sys.git"
-path = "/local/poet-sys"
+git = "https://github.com/connorimes/poet-sys.git"
