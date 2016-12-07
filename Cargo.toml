@@ -4,12 +4,12 @@ version = "0.1.0"
 authors = ["Connor Imes <connor.k.imes@gmail.com>"]
 description = "Rust wrappers for poet"
 license = "MIT"
-homepage = "https://github.com/connorimes/poet-rust"
-repository = "https://github.com/connorimes/poet-rust"
+homepage = "https://github.com/libpoet/poet-rust"
+repository = "https://github.com/libpoet/poet-rust"
 keywords = ["poet", "performance", "optimal", "energy", "toolkit", "feedback", "control"]
 
 [dependencies]
-libc = "0.1"
+libc = "0.2"
 
 [dependencies.poet-sys]
-git = "https://github.com/connorimes/poet-sys.git"
+git = "https://github.com/libpoet/poet-sys.git"
