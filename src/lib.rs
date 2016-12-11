@@ -94,31 +94,21 @@ impl POET {
     pub fn new(perf_goal: f64,
                mut control_states: Vec<poet_control_state_t>,
                mut cpu_states: Vec<poet_cpu_state_t>,
-               apply_func: Option<poet_apply_func>,
-               curr_state_func: Option<poet_curr_state_func>,
+               apply_func: poet_apply_func,
+               curr_state_func: poet_curr_state_func,
                period: u32,
                buffer_depth: u32,
                log_filename: Option<&CString>) -> Result<POET, &'static str> {
         if control_states.len() != cpu_states.len() {
             return Err("Number of control and cpu states don't match");
         }
-        // the following necessary cast for None seem to be a bug in Rust coercion
-        let apply_func: poet_apply_func = match apply_func {
-            Some(p) => p,
-            None => apply_cpu_config_wrapper,
-        };
-        let curr_state_func: poet_curr_state_func = match curr_state_func {
-            Some(p) => p,
-            None => get_current_cpu_state_wrapper,
-        };
         let log_ptr = match log_filename {
             Some(l) => l.as_ptr(),
             None => ptr::null(),
         };
         let poet = unsafe {
-            let num_states = control_states.len() as u32;
             poet_init(perf_goal,
-                      num_states, control_states.as_mut_ptr(), cpu_states.as_mut_ptr(),
+                      control_states.len() as c_uint, control_states.as_mut_ptr(), cpu_states.as_mut_ptr(),
                       apply_func, curr_state_func,
                       period, buffer_depth, log_ptr)
         };
