@@ -129,6 +129,13 @@ impl POET {
             poet_apply_control(self.poet, tag, window_rate, window_power);
         }
     }
+
+    /// Change the performance goal.
+    pub fn set_performance_goal(&mut self, perf_goal: f64) {
+        unsafe {
+            poet_set_performance_goal(self.poet, perf_goal);
+        }
+    }
 }
 
 impl Drop for POET {
@@ -154,6 +161,7 @@ mod test {
                                  control_states, cpu_states,
                                  None, None,
                                  20u32, 1u32, None).unwrap();
+        poet.set_performance_goal(200.0);
         poet.apply_control(0, 1.0, 1.0);
     }
 
